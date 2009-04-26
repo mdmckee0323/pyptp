@@ -1,12 +1,13 @@
 #!/usr/bin/python2.5
+# -*- coding: utf-8 -*-
 
 import gtk
 import hildon
 import sys
 import traceback
-from pyptp.PtpUsbTransport import PtpUsbTransport
-from pyptp.PtpSession import PtpSession, PtpException
-from pyptp import PtpValues
+from ptp.PtpUsbTransport import PtpUsbTransport
+from ptp.PtpSession import PtpSession, PtpException
+from ptp import PtpValues
 
 class UITest:
 	

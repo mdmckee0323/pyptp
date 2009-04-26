@@ -1,10 +1,11 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import sys
 import traceback
-from pyptp.PtpUsbTransport import PtpUsbTransport
-from pyptp.PtpSession import PtpSession, PtpException
-from pyptp import PtpValues
+from ptp.PtpUsbTransport import PtpUsbTransport
+from ptp.PtpSession import PtpSession, PtpException
+from ptp import PtpValues
 
 ptpTransport = PtpUsbTransport(0, 0)
 ptpSession = PtpSession(ptpTransport)
