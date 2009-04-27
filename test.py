@@ -26,10 +26,10 @@ try:
 #    print "%i" % ptpSession.GetDevicePropValue(0xd126, False, "b")
     
     for id in rw_vals:
-      print "RW: %04x: %02x" % (id, ptpSession.GetDevicePropValue(id, False, "B"))
+        print "RW: %04x: %02x" % (id, ptpSession.GetDevicePropValue(id, False, "B"))
     print
     for id in ro_vals:
-      print "RO: %04x: %02x" % (id, ptpSession.GetDevicePropValue(id, False, "B"))
+        print "RO: %04x: %02x" % (id, ptpSession.GetDevicePropValue(id, False, "B"))
 
 
 except PtpException, e:

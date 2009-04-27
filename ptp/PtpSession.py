@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PtpAbstractTransport import PtpRequest, PtpResponse
 import PtpValues
 import struct

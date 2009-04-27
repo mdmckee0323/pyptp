@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import PtpSession
 import PtpValues
 import PtpAbstractTransport
@@ -13,7 +14,7 @@ class NikonCurveInfo:
         unpacker = PtpSession.PtpUnpacker(raw)
         
         (data_length, unknown, self.xaxis_start, self.xaxis_end, self.yaxis_start, self.yaxis_end,
-         self.midpoint_integer, self.midpoint_decimal, coordcount) = unpacker.unpack("<IHBBBBBBB")
+        self.midpoint_integer, self.midpoint_decimal, coordcount) = unpacker.unpack("<IHBBBBBBB")
         
         self.coordinates = ()
         while coordcount:
