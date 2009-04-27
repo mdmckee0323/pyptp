@@ -20,7 +20,7 @@ try:
     fstops = ptpSession.GetDevicePropInfo(PtpValues.StandardProperties.F_NUMBER).Enumeration
     for fstop in fstops:
         ptpSession.SetFNumber(fstop)
-        print "Trying %i" % fstop
+        print "Capturing %i" % fstop
 
         ptpSession.InitiateCapture(objectFormatId=PtpValues.StandardObjectFormats.EXIF_JPEG)
         while True:
