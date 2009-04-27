@@ -7,7 +7,7 @@ from ptp.PtpUsbTransport import PtpUsbTransport
 from ptp.PtpSession import PtpSession, PtpException
 from ptp import PtpValues
 
-ptpTransport = PtpUsbTransport(0, 0)
+ptpTransport = PtpUsbTransport(PtpUsbTransport.findptps()[0])
 ptpSession = PtpSession(ptpTransport)
 
 vendorId = PtpValues.Vendors.STANDARD
@@ -22,12 +22,11 @@ try:
 
         objectid = None
         while True:
-            evt = ptpSession.CheckForEvent(30000)
+            evt = ptpSession.CheckForEvent(None)
             if evt == None:
                 raise Exception("Capture did not complete")
             if evt.eventcode == PtpValues.StandardEvents.OBJECT_ADDED:
                 objectid = evt.params[0]
-            if evt.eventcode == PtpValues.StandardEvents.CAPTURE_COMPLETE:
                 break
 
         if objectid != None:
