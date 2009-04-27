@@ -7,7 +7,7 @@ from ptp.PtpUsbTransport import PtpUsbTransport
 from ptp.PtpSession import PtpSession, PtpException
 from ptp import PtpValues
 
-ptpTransport = PtpUsbTransport(0, 0)
+ptpTransport = PtpUsbTransport(PtpUsbTransport.findptps()[0])
 ptpSession = PtpSession(ptpTransport)
 
 vendorId = PtpValues.Vendors.STANDARD
