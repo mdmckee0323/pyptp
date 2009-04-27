@@ -13,29 +13,23 @@ if len(sys.argv) != 2:
     sys.exit(1)
 delay = int(sys.argv[1])
 
-ptpTransport = PtpUsbTransport(PtpUsbTransport.findptps()[0])
-ptpSession = PtpSession(ptpTransport)
+while True:
+    # Setup connection to camera
+    ptpTransport = PtpUsbTransport(PtpUsbTransport.findptps()[0])
+    ptpSession = PtpSession(ptpTransport)
+    vendorId = PtpValues.Vendors.STANDARD
 
-vendorId = PtpValues.Vendors.STANDARD
-try:
     ptpSession.OpenSession()
     deviceInfo = ptpSession.GetDeviceInfo()
     vendorId = deviceInfo.VendorExtensionID
 
+    ptpSession.InitiateCapture(objectFormatId=PtpValues.StandardObjectFormats.EXIF_JPEG)
     while True:
-        ptpSession.InitiateCapture(objectFormatId=PtpValues.StandardObjectFormats.EXIF_JPEG)
-        while True:
-            evt = ptpSession.CheckForEvent(None)
-            if evt.eventcode == PtpValues.StandardEvents.OBJECT_ADDED:
-                break
+        evt = ptpSession.CheckForEvent(None)
+        if evt.eventcode == PtpValues.StandardEvents.OBJECT_ADDED:
+            break
 
-        time.sleep(delay)
+    del ptpSession
+    del ptpTransport
 
-except PtpException, e:
-    print "PTP Exception: %s" % PtpValues.ResponseNameById(e.responsecode, vendorId)
-except Exception, e:
-    print "An exception occurred: %s" % e
-    traceback.print_exc()
-
-del ptpSession
-del ptpTransport
+    time.sleep(delay)
