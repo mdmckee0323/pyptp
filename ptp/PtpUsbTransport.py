@@ -14,17 +14,12 @@ class PtpUsbTransport(PtpAbstractTransport.PtpAbstractTransport):
     PTP_USB_CONTAINER_RESPONSE              = 3
     PTP_USB_CONTAINER_EVENT                 = 4
 
-    def __init__(self, busno, devno):
+    def __init__(self, device):
         """Create a new PtpUsbTransport instance.
         
         Arguments:
-        busno -- USB bus number
-        devno -- USB device number."""
-        
-        self.busno = busno
-        self.devno = devno
-        device = usb.busses()[busno].devices[devno]
-        
+        device -- USB ptp device."""
+                
         # Check the device is a PTP one
         if (device.configurations[0].interfaces[0][0].interfaceClass != self.USB_CLASS_PTP):
             raise UsbException("Supplied USB device is not a PTP device")
@@ -60,10 +55,10 @@ class PtpUsbTransport(PtpAbstractTransport.PtpAbstractTransport):
         """Cleanup a PtpUsbTransport structure."""
         
         try:
-                self.__usb_handle.releaseInterface(self.__usb_interface)
-                del self.__usb_handle
+            self.__usb_handle.releaseInterface(self.__usb_interface)
+            del self.__usb_handle
         except:
-                pass
+            pass
 
     
     def send_ptp_request(self, request):
@@ -78,12 +73,15 @@ class PtpUsbTransport(PtpAbstractTransport.PtpAbstractTransport):
     
     def send_ptp_data(self, request, data):
         buffer = struct.pack("<IHHI", 12 + len(data), self.PTP_USB_CONTAINER_DATA, request.opcode, request.transactionid)
-        
-        # FIXME: untested code!
-        if self.__usb_handle.bulkWrite(self.__bulkout, buffer, self.usb_write_timeout) != 12:
-            raise UsbException(usb.USBError)
-        if self.__usb_handle.bulkWrite(self.__bulkout, data, self.usb_write_timeout) != len(data):
-            raise UsbException(usb.USBError)
+        buffer += data
+
+        # NOTE: UNTESTED CODE
+        while len(buffer) > 0:
+            tmp = self.__usb_handle.bulkWrite(self.__bulkout, buffer, self.usb_write_timeout)
+            if tmp == 0:
+                raise UsbException(usb.USBError)
+
+            buffer = buffer[tmp:]
 
 
     def get_ptp_data(self, request, stream = None):
@@ -145,24 +143,21 @@ class PtpUsbTransport(PtpAbstractTransport.PtpAbstractTransport):
         if timeout == None:
             timeout = 0
         
-        try:
-            # Read the header
-            hdr = self.__usb_bulkread(timeout = timeout, ep=self.__irqin)
-            (data_size, container_type, code) = struct.unpack("<IHH", hdr[0:8])
+        # Read the packet
+        pkt = self.__usb_bulkread(timeout = timeout, ep=self.__irqin)
+        (data_size, container_type, code) = struct.unpack("<IHH", pkt[0:8])
 
-            # Make sure it is sane (paranoia mode++)
-            if container_type != self.PTP_USB_CONTAINER_EVENT:
-                raise UsbException("Received unexpected PTP USB container type (0x%04x)" % container_type)
+        # Make sure it is sane (paranoia mode++)
+        if container_type != self.PTP_USB_CONTAINER_EVENT:
+            raise UsbException("Received unexpected PTP USB container type (0x%04x)" % container_type)
 
-            # Read the body
-            pkt = self.__usb_bulkread(timeout = timeout, ep=self.__irqin)
-            param_count = (data_size - 12) / 4
+        # Extract the body
+        pkt = pkt[8:]
+        param_count = (data_size - 12) / 4
 
-            # Parse it
-            (transactionid, ) = struct.unpack("<I", pkt[0:4])
-            params = struct.unpack("<" + ("I" * param_count), pkt[4:])
-        except:
-            return None
+        # Parse it
+        (transactionid, ) = struct.unpack("<I", pkt[0:4])
+        params = struct.unpack("<" + ("I" * param_count), pkt[4:])
 
         return PtpAbstractTransport.PtpEvent(code, sessionid, transactionid, params)
 
@@ -199,6 +194,20 @@ class PtpUsbTransport(PtpAbstractTransport.PtpAbstractTransport):
         print
         for b in data:
             print hex(ord(b))
+
+    @classmethod
+    def findptps(cls):
+        ptps = ()
+
+        for bus in usb.busses():
+            for device in bus.devices:
+                if (device.configurations[0].interfaces[0][0].interfaceClass != PtpUsbTransport.USB_CLASS_PTP):
+                    continue
+                if (device.deviceClass == usb.CLASS_HUB):
+                    continue
+                ptps += (device, )
+
+        return ptps
 
 class UsbException(Exception):
 
