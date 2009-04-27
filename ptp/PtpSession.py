@@ -515,13 +515,13 @@ class PtpSession:
         return self.GetDevicePropValue(PtpValues.StandardProperties.WHITE_BALANCE, False, "H")
 
     def SetWhiteBalance(self, value):
-        return self.GetDevicePropValue(PtpValues.StandardProperties.WHITE_BALANCE, False, "H", value)
+        return self.SetDevicePropValue(PtpValues.StandardProperties.WHITE_BALANCE, False, "H", value)
 
     def GetFNumber(self):
         return self.GetDevicePropValue(PtpValues.StandardProperties.F_NUMBER, False, "H")
 
     def SetFNumber(self, value):
-        return self.GetDevicePropValue(PtpValues.StandardProperties.F_NUMBER, False, "H", value)
+        return self.SetDevicePropValue(PtpValues.StandardProperties.F_NUMBER, False, "H", value)
 
     def GetFocalLength(self):
         return self.GetDevicePropValue(PtpValues.StandardProperties.FOCAL_LENGTH, False, "L")
