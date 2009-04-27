@@ -29,7 +29,7 @@ try:
             if evt.eventcode == PtpValues.StandardEvents.OBJECT_ADDED:
                 break
 
-        time.sleep(delay * 1000)
+        time.sleep(delay)
 
 except PtpException, e:
     print "PTP Exception: %s" % PtpValues.ResponseNameById(e.responsecode, vendorId)
