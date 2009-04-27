@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import PtpAbstractTransport
 import usb
 import struct
@@ -64,7 +65,7 @@ class PtpUsbTransport(PtpAbstractTransport.PtpAbstractTransport):
         except:
                 pass
 
-       
+    
     def send_ptp_request(self, request):
         length = 12 + (len(request.params) * 4)
         buffer = struct.pack("<IHHI", length, self.PTP_USB_CONTAINER_COMMAND, request.opcode, request.transactionid)
